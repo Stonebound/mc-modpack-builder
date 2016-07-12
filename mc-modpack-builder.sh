@@ -138,6 +138,9 @@ case "$1" in
         wget -O downloader.jar 'https://jenkins.dries007.net/job/CurseModpackDownloader/lastSuccessfulBuild/artifact/build/libs/CurseModpackDownloader-0.1.0.10.jar'
 
         # Download ServerStart.* and eula.txt
+        wget -O ServerStart.bat 'https://cdn.rawgit.com/Stonebound/mc-modpack-builder/37ccb40cf958983953a00c204c483234880f1732/files/ServerStart.bat'
+        wget -O ServerStart.sh 'https://cdn.rawgit.com/Stonebound/mc-modpack-builder/37ccb40cf958983953a00c204c483234880f1732/files/ServerStart.sh'
+        wget -O eula.txt 'https://cdn.rawgit.com/Stonebound/mc-modpack-builder/37ccb40cf958983953a00c204c483234880f1732/files/eula.txt'
 
         echo #newline for cleanliness
         boldDisplay "Setup complete."
