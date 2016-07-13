@@ -7,6 +7,16 @@ This program will take a Repo hosted on Github in the Curse Export format ([exam
 * TechicLauncher Zip
 * Server Download Zip
 
+Installation
+-----
+
+Grab the latest version from the Release section and make it executable with
+```
+wget https://raw.githubusercontent.com/Stonebound/mc-modpack-builder/master/mc-modpack-builder.sh
+chmod +x mc-modpack-builder.sh
+```
+then edit the script and change the variables at the top for your needs. If you have clientside only mods in your pack add them [here](https://github.com/Stonebound/mc-modpack-builder/blob/master/mc-modpack-builder.sh#L102).
+
 Usage
 -----
 
