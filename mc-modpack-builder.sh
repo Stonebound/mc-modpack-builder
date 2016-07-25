@@ -8,7 +8,7 @@ packname=Principium
 gituser=Stonebound
 reponame=Principium
 branch="1.10.2"
-forgeversion="1.10.2-12.18.1.2011"
+forgeversion="1.10.2-12.18.1.2018"
 
 ## Extra variables
 fileRoot=$HOME/mcmodpackbuilder
@@ -28,6 +28,8 @@ case "$1" in
         fi
 
         cd $fileRoot
+        rm -R temp
+        mkdir temp
 
         echo "Starting build process"
         echo "Please enter a new version number:"
@@ -64,12 +66,9 @@ case "$1" in
         cp pack.zip $fileRoot/builds/Curse_$packname-$packversion.zip
 
         # Clear folder for pack with mods
-        if [[ -f withmods ]]; then
-			rm -rf withmods
-            mkdir withmods
-        else
-            mkdir withmods
-		fi
+        cd $fileRoot/temp/
+        rm -R withmods
+        mkdir withmods
 
         # Download mods from Curse
         java -jar $fileRoot/extras/downloader.jar -i pack.zip -o withmods
@@ -84,18 +83,21 @@ case "$1" in
         # Download universal forge jar
         # Zip up everything and exclude extra files
         mkdir bin
-        wget -O extras/forge-$forgeversion-universal.jar http://files.minecraftforge.net/maven/net/minecraftforge/forge/$forgeversion/forge-$forgeversion-universal.jar
+        wget -O bin/modpack.jar http://files.minecraftforge.net/maven/net/minecraftforge/forge/$forgeversion/forge-$forgeversion-universal.jar
         zip -r $fileRoot/builds/Technic_$packname-$packversion.zip * -x "forge-*-installer.jar"
 
         # Cleanup Technic files
         rm -R bin
+
+        # Create Client zip
+        zip -r $fileRoot/builds/Client_$packname-$packversion.zip *
 
         # Create Server zip
         java -jar forge-*-installer.jar --installServer
         rm forge-*-installer.jar*
         mv forge-* forge_server.jar
         cp $fileRoot/extras/ServerStart.* .
-        cp $fileRoot/extras/eula.txt
+        cp $fileRoot/extras/eula.txt .
         # Delete client side mods
 
         #################################
