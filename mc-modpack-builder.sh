@@ -8,7 +8,7 @@ packname=Principium
 gituser=Stonebound
 reponame=Principium
 branch="1.10.2"
-forgeversion="1.10.2-12.18.1.2018"
+forgeversion="1.10.2-12.18.1.2026"
 
 ## Extra variables
 fileRoot=$HOME/mcmodpackbuilder
@@ -27,70 +27,67 @@ case "$1" in
             exit 0
         fi
 
-        cd $fileRoot
-        rm -R temp
-        mkdir temp
+        cd $fileRoot/temp
 
         echo "Starting build process"
+        echo "Make sure you updated the forge version if needed in the script. You can ctrl+c now if you haven't"
         echo "Please enter a new version number:"
         read packversion
 
         # Alternatively ask for Forge version instead of as a set variable above
-#       echo "Please enter the forge version:"
-#       read forgeversion
+#        echo ""
+#        read forgeversion
 
-        # Download Zip from github
-        wget -O temp/gitpack.zip https://codeload.github.com/$gituser/$reponame/zip/$branch
-
-        # Extracting Zip and deleting it when done
-        cd temp
-        unzip gitpack.zip
-        rm gitpack.zip
-
-        # Cleanup Github extras
+        # Update from Github
         cd $reponame-$branch/
-
-        ###########################################################################
-        ## Add extra files in your repo, that you dont want in the release here. ##
-        ###########################################################################
-        rm README.md
-        rm ISSUE_TEMPLATE.md
-        rm .gitignore
+        git fetch --all
+        git reset --hard origin/$branch
+        git pull origin $branch
 
         # Compressing files in proper Curse format
-        zip -r ../pack.zip *
+        zip -r $fileRoot/builds/Curse_$packname-$packversion.zip * -x "mods/*" -x ".gitignore" -x "ISSUE_TEMPLATE.md" -x "README.md"
         cd ..
-        rm -R $reponame-$branch/
-
-        # Copy Curse Zip to builds folder and name it properly
-        cp pack.zip $fileRoot/builds/Curse_$packname-$packversion.zip
 
         # Clear folder for pack with mods
-        cd $fileRoot/temp/
-        rm -R withmods
-        mkdir withmods
+        rm -R $fileRoot/temp/withmods
+        mkdir $fileRoot/temp/withmods
 
-        # Download mods from Curse
-        java -jar $fileRoot/extras/downloader.jar -i pack.zip -o withmods
-
-        # Cleanup extra files
-        cd withmods
-        rm CurseModpackDownloader.txt
-        rm modlist.html
-        rm manifest.json
+        # Copy files from git folder
+        cd $fileRoot/temp/withmods
+        cp -R $fileRoot/temp/$reponame-$branch/mods .
+        cp -R $fileRoot/temp/$reponame-$branch/overrides/config .
 
         # Create Technic Client Zip
         # Download universal forge jar
         # Zip up everything and exclude extra files
         mkdir bin
         wget -O bin/modpack.jar http://files.minecraftforge.net/maven/net/minecraftforge/forge/$forgeversion/forge-$forgeversion-universal.jar
-        zip -r $fileRoot/builds/Technic_$packname-$packversion.zip * -x "forge-*-installer.jar"
+        zip -r $fileRoot/builds/Technic_$packname-$packversion.zip *
 
         # Cleanup Technic files
         rm -R bin
 
         # Create Client zip
+        wget -O forge-$forgeversion-installer.jar http://files.minecraftforge.net/maven/net/minecraftforge/forge/$forgeversion/forge-$forgeversion-installer.jar
         zip -r $fileRoot/builds/Client_$packname-$packversion.zip *
+
+        # Create MultiMC zip
+        mv forge-$forgeversion-installer.jar ../
+        cp -R $fileRoot/extras/MultiMC/* .
+        mv mods minecraft
+        mv config minecraft
+        cd ..
+        mv withmods "Principium ${packversion}"
+        zip -r $fileRoot/builds/MultiMC_$packname-$packversion.zip "Principium ${packversion}"
+        mv "Principium ${packversion}" withmods
+        cd withmods
+        mv minecraft/mods .
+        mv minecraft/config .
+        rm -R config
+        rm -R patches
+        rm .packignore
+        rm instance.cfg
+        mv ../forge-$forgeversion-installer.jar .
 
         # Create Server zip
         java -jar forge-*-installer.jar --installServer
@@ -135,22 +132,22 @@ case "$1" in
         cd $fileRoot
         mkdir -p {temp,builds,extras}
 
-        # Download CurseModpackDownloader
+        # Clone Repo from Github
+        cd temp
+        git clone -b $branch https://github.com/Stonebound/$reponame.git $reponame-$branch
+        
+        ## Download extra files
         cd extras
-        wget -O downloader.jar 'https://jenkins.dries007.net/job/CurseModpackDownloader/lastSuccessfulBuild/artifact/build/libs/CurseModpackDownloader-0.1.0.10.jar'
+        
 
-        # Download ServerStart.* and eula.txt
-        wget -O ServerStart.bat 'https://cdn.rawgit.com/Stonebound/mc-modpack-builder/37ccb40cf958983953a00c204c483234880f1732/files/ServerStart.bat'
-        wget -O ServerStart.sh 'https://cdn.rawgit.com/Stonebound/mc-modpack-builder/37ccb40cf958983953a00c204c483234880f1732/files/ServerStart.sh'
-        wget -O eula.txt 'https://cdn.rawgit.com/Stonebound/mc-modpack-builder/37ccb40cf958983953a00c204c483234880f1732/files/eula.txt'
-
+        # done
         echo #newline for cleanliness
         boldDisplay "Setup complete."
         exit 0
     ;;
     *)
         boldDisplay "Minecraft Modpack Builder"
-        echo "Version 0.10 - Author phit <phit@hush.com>"
+        echo "Version 0.18 - Author phit <phit@hush.com>"
         echo #newline for cleanliness
         echo "Available Options:"
         echo "setup     Create directories and download required files"
