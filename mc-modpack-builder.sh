@@ -74,8 +74,10 @@ case "$1" in
         # Create MultiMC zip
         mv forge-$forgeversion-installer.jar ../
         cp -R $fileRoot/extras/MultiMC/* .
-        mv mods minecraft
-        mv config minecraft
+        mkdir minecraft
+        mv mods minecraft/mods
+        mv config minecraft/config
+        sed -i -- 's/ [0-9].[0-9].[0-9]/ ${packversion}/g' instance.cfg
         cd ..
         mv withmods "Principium ${packversion}"
         zip -r $fileRoot/builds/MultiMC_$packname-$packversion.zip "Principium ${packversion}"
@@ -83,7 +85,7 @@ case "$1" in
         cd withmods
         mv minecraft/mods .
         mv minecraft/config .
-        rm -R config
+        rm -R minecraft
         rm -R patches
         rm .packignore
         rm instance.cfg
