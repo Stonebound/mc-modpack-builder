@@ -1,11 +1,13 @@
 Minecraft Modpack Builder
 ======================
 
-This program will take a Repo hosted on Github in the Curse Export format ([example repo](https://github.com/Stonebound/Principium)), download it and automatically create Release Zip files for you. Currently it supports the following formats:
+This program will take a repo hosted on Github in the Curse Export format ([example repo](https://github.com/Stonebound/Principium)), download it and automatically create release zip files for you. Currently it supports the following formats:
 
-* CurseForge Zip
-* TechicLauncher Zip
-* Server Download Zip
+* CurseForge
+* Techic Launcher
+* MultiMC
+* Manual Installation (for Vanilla launcher, includes Forge installer)
+* Server Download (comes with start scripts and forge files)
 
 Installation
 -----
@@ -20,6 +22,6 @@ Usage
 Options:
 
     setup
-        Create directories and download required files
+        Creates directories and downloads required files
     build
-        Create Zip builds for Curse, Technic and Server
+        Creates builds for Curse, Technic, MulticMC, Manual Install and Server
